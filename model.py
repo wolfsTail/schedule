@@ -65,3 +65,55 @@ class Availability:
             f"remaining_seats={self.remaining_seats!r}, bookings={self.bookings!r}, "
             f"is_active={self.is_active!r})"
         )
+    
+
+class Schedule:
+    def __init__(self):
+        self.voyages: dict[int, Voyage] = {}
+        self.availability: dict[int, Availability] = {}
+        self.tickets: dict[int, Ticket] = {}
+    
+    def add_voyage(self, voyage: Voyage):
+        self.voyages[voyage.voyage_id] = voyage
+    
+    def add_availability(self, availability: Availability):
+        if availability.voyage_id not in self.voyages:
+            raise ValueError(f"Voyage with ID {availability.voyage_id} not found.")
+        self.availability[availability.voyage_id] = availability
+    
+    def add_ticket(self, ticket: Ticket):
+        if ticket.voyage_id not in self.voyages:
+            raise ValueError(f"Voyage with ID {ticket.voyage_id} not found.")
+        self.tickets[ticket.ticket_id] = ticket
+    
+    def get_schedule_by_date(self, start_date: datetime, end_date: datetime) -> list[Voyage]:
+        return [
+            voyage for voyage in self.voyages.values()
+            if start_date <= voyage.dep_datetime_utc <= end_date
+        ]
+    
+    def get_voyage_availability(self, voyage_id: int) -> Availability:
+        return self.availability.get(voyage_id, None)
+    
+    def get_tickets_by_voyage(self, voyage_id: int) -> list[Ticket]:
+        return [ticket for ticket in self.tickets.values() if ticket.voyage_id == voyage_id]
+    
+    def analyze_load(self, voyage_id: int) -> dict[str, int]:
+        availability = self.get_voyage_availability(voyage_id)
+        if not availability:
+            raise ValueError(f"Availability for voyage ID {voyage_id} not found.")
+        
+        tickets = self.get_tickets_by_voyage(voyage_id)
+        sold_seats = len([ticket for ticket in tickets if ticket.is_active])
+        
+        return {
+            "total_seats": availability.remaining_seats + availability.bookings,
+            "sold_seats": sold_seats,
+            "remaining_seats": availability.remaining_seats,
+        }
+    
+    def __repr__(self):
+        return (
+            f"Schedule: {len(self.voyages)} voyages, "
+            f"{len(self.availability)} availabilities, {len(self.tickets)} tickets"
+        )
