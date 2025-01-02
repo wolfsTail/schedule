@@ -10,7 +10,7 @@ class Location:
 
 @dataclass
 class Ticket:
-    ticket_id: int
+    ticket_id: int | None
     price: float
     voyage_id: int
     is_active: bool
@@ -19,7 +19,7 @@ class Ticket:
 class Voyage:
     def __init__(
         self,
-        voyage_id: int,
+        voyage_id: int | None,
         dep_datetime_utc: datetime,
         arr_datetime_utc: datetime,
         origin: Location,
@@ -27,7 +27,7 @@ class Voyage:
         marketing_number: int,
         vehicle_number: str,
     ):
-        self.voyage_id = voyage_id
+        self.voyage_id = voyage_id,
         self.dep_datetime_utc = dep_datetime_utc
         self.arr_datetime_utc = arr_datetime_utc
         self.origin = origin
