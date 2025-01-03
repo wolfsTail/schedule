@@ -1,4 +1,4 @@
-import model
+from schedule import domain
 
 
 class BaseService:
@@ -12,7 +12,7 @@ class LocationService(BaseService):
         self.location_repo = location_repo
 
     def create_location(self, title, latitude, longitude):
-        location = model.Location(
+        location = domain.Location(
             title=title,
             coordinates=(latitude, longitude)
         )
@@ -68,7 +68,7 @@ class VoyageService(BaseService):
         if not origin or not destination:
             raise ValueError("Invalid origin or destination ID")
 
-        voyage = model.Voyage(
+        voyage = domain.Voyage(
             voyage_id=None,
             dep_datetime_utc=dep_datetime_utc,
             arr_datetime_utc=arr_datetime_utc,
@@ -96,7 +96,7 @@ class TicketService(BaseService):
         if not voyage:
             raise ValueError("Invalid voyage ID")
 
-        ticket = model.Ticket(
+        ticket = domain.Ticket(
             ticket_id=None,
             price=price,
             voyage_id=voyage_id,
@@ -121,7 +121,7 @@ class AvailabilityService(BaseService):
         if not voyage:
             raise ValueError("Invalid voyage ID")
 
-        availability = model.Availability(
+        availability = domain.Availability(
             voyage_id=voyage_id,
             remaining_seats=remaining_seats,
             bookings=bookings,
@@ -153,7 +153,7 @@ class ScheduleService(BaseService):
         if not origin or not destination:
             raise ValueError("Invalid origin or destination ID")
 
-        voyage = model.Voyage(
+        voyage = domain.Voyage(
             voyage_id=None,
             dep_datetime_utc=dep_datetime_utc,
             arr_datetime_utc=arr_datetime_utc,
@@ -165,7 +165,7 @@ class ScheduleService(BaseService):
         self.voyage_repo.add(voyage)
         self.session.flush()
 
-        availability = model.Availability(
+        availability = domain.Availability(
             voyage_id=voyage.voyage_id,
             remaining_seats=remaining_seats,
             bookings=bookings,
@@ -187,11 +187,11 @@ class ScheduleService(BaseService):
         return voyage
 
     def get_schedule(self, start_date=None, end_date=None):
-        query = self.session.query(model.Voyage)
+        query = self.session.query(domain.Voyage)
         if start_date:
-            query = query.filter(model.Voyage.dep_datetime_utc >= start_date)
+            query = query.filter(domain.Voyage.dep_datetime_utc >= start_date)
         if end_date:
-            query = query.filter(model.Voyage.dep_datetime_utc <= end_date)
+            query = query.filter(domain.Voyage.dep_datetime_utc <= end_date)
         return query.all()
 
     def get_full_voyage_details(self, voyage_id):

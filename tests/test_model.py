@@ -2,7 +2,7 @@ from datetime import datetime
 
 import pytest
 
-from model import (
+from schedule.domain.model import (
     Availability,
     Location,
     Schedule,

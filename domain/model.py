@@ -27,7 +27,7 @@ class Voyage:
         marketing_number: int,
         vehicle_number: str,
     ):
-        self.voyage_id = voyage_id,
+        self.voyage_id = voyage_id
         self.dep_datetime_utc = dep_datetime_utc
         self.arr_datetime_utc = arr_datetime_utc
         self.origin = origin

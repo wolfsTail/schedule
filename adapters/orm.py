@@ -1,6 +1,7 @@
 from sqlalchemy import Table, MetaData, Column, Integer, String, Float, DateTime, Boolean, ForeignKey
 from sqlalchemy.orm import mapper, relationship, clear_mappers
-import model
+from schedule import domain
+
 
 metadata = MetaData()
 
@@ -48,12 +49,12 @@ def start_mappers():
     clear_mappers()
 
     mapper(
-        model.Location,
+        domain.Location,
         locations,
     )
 
     mapper(
-        model.Voyage,
+        domain.Voyage,
         voyages,
         properties={
             "origin": relationship(model.Location, foreign_keys=[voyages.c.origin_id]),
@@ -64,7 +65,7 @@ def start_mappers():
     )
 
     mapper(
-        model.Ticket,
+        domain.Ticket,
         tickets,
         properties={
             "voyage": relationship(model.Voyage, back_populates="tickets"),
@@ -72,7 +73,7 @@ def start_mappers():
     )
 
     mapper(
-        model.Availability,
+        domain.Availability,
         availability,
         properties={
             "voyage": relationship(model.Voyage, back_populates="availability"),

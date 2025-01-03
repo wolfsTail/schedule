@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 from sqlalchemy.orm import Session
 
-import model
+from schedule import domain
 
 
 class AbstractRepository(ABC):
@@ -39,12 +39,12 @@ class SQLAlchemyRepository(AbstractRepository):
 
 class LocationRepository(SQLAlchemyRepository):
     def __init__(self, session):
-        super().__init__(session, model.Location)
+        super().__init__(session, domain.Location)
 
 
 class VoyageRepository(SQLAlchemyRepository):
     def __init__(self, session):
-        super().__init__(session, model.Voyage)
+        super().__init__(session, domain.Voyage)
 
     def get_by_origin(self, origin_id):
         return self.session.query(self.model).filter_by(origin_id=origin_id).all()
@@ -52,7 +52,7 @@ class VoyageRepository(SQLAlchemyRepository):
 
 class TicketRepository(SQLAlchemyRepository):
     def __init__(self, session):
-        super().__init__(session, model.Ticket)
+        super().__init__(session, domain.Ticket)
 
     def get_active_tickets(self, voyage_id):
         return self.session.query(self.model).filter_by(voyage_id=voyage_id, is_active=True).all()
@@ -60,7 +60,7 @@ class TicketRepository(SQLAlchemyRepository):
 
 class AvailabilityRepository(SQLAlchemyRepository):
     def __init__(self, session):
-        super().__init__(session, model.Availability)
+        super().__init__(session, domain.Availability)
 
     def get_by_voyage(self, voyage_id):
         return self.session.query(self.model).filter_by(voyage_id=voyage_id).first()
