@@ -1,9 +1,16 @@
-from sqlalchemy import Table, MetaData, Column, Integer, String, Float, DateTime, Boolean, ForeignKey
+from sqlalchemy import Table, MetaData, Column, Integer, String, Float, DateTime, Boolean, ForeignKey, Date
 from sqlalchemy.orm import mapper, relationship, clear_mappers
 from schedule import domain
 
 
 metadata = MetaData()
+
+schedules = Table(
+    "schedules",
+    metadata,
+    Column("id", Integer, primary_key=True, autoincrement=True),
+    Column("schedule_date", Date, nullable=False, unique=True),
+)
 
 locations = Table(
     "locations",
@@ -24,6 +31,7 @@ voyages = Table(
     Column("destination_id", ForeignKey("locations.id"), nullable=False),
     Column("marketing_number", Integer, nullable=False),
     Column("vehicle_number", String(255), nullable=False),
+    Column("schedule_id", ForeignKey("schedules.id"), nullable=False),
 )
 
 tickets = Table(
@@ -49,6 +57,16 @@ def start_mappers():
     clear_mappers()
 
     mapper(
+        domain.Schedule,
+        schedules,
+        properties={
+            "voyages": relationship(
+                domain.Voyage, back_populates="schedule", cascade="all, delete-orphan"
+            ),
+        },
+    )
+
+    mapper(
         domain.Location,
         locations,
     )
@@ -57,10 +75,11 @@ def start_mappers():
         domain.Voyage,
         voyages,
         properties={
-            "origin": relationship(model.Location, foreign_keys=[voyages.c.origin_id]),
-            "destination": relationship(model.Location, foreign_keys=[voyages.c.destination_id]),
-            "tickets": relationship(model.Ticket, back_populates="voyage"),
-            "availability": relationship(model.Availability, back_populates="voyage", uselist=False),
+            "origin": relationship(domain.Location, foreign_keys=[voyages.c.origin_id]),
+            "destination": relationship(domain.Location, foreign_keys=[voyages.c.destination_id]),
+            "tickets": relationship(domain.Ticket, back_populates="voyage"),
+            "availability": relationship(domain.Availability, back_populates="voyage", uselist=False),
+            "schedule": relationship(domain.Schedule, back_populates="voyages"),
         },
     )
 
@@ -68,7 +87,7 @@ def start_mappers():
         domain.Ticket,
         tickets,
         properties={
-            "voyage": relationship(model.Voyage, back_populates="tickets"),
+            "voyage": relationship(domain.Voyage, back_populates="tickets"),
         },
     )
 
@@ -76,6 +95,6 @@ def start_mappers():
         domain.Availability,
         availability,
         properties={
-            "voyage": relationship(model.Voyage, back_populates="availability"),
+            "voyage": relationship(domain.Voyage, back_populates="availability"),
         },
     )

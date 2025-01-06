@@ -64,3 +64,18 @@ class AvailabilityRepository(SQLAlchemyRepository):
 
     def get_by_voyage(self, voyage_id):
         return self.session.query(self.model).filter_by(voyage_id=voyage_id).first()
+
+
+class ScheduleRepository(SQLAlchemyRepository):
+    def __init__(self, session):
+        super().__init__(session, domain.Schedule)
+
+    def get_by_date(self, schedule_date):
+        return self.session.query(self.model).filter_by(schedule_date=schedule_date).first()
+
+    def list_by_date_range(self, start_date, end_date):
+        return (
+            self.session.query(self.model)
+            .filter(self.model.schedule_date >= start_date, self.model.schedule_date <= end_date)
+            .all()
+        )
